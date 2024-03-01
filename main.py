@@ -44,11 +44,12 @@ config = load_config()
 app = Client("Stickers To Gifs", api_id=config['api_id'], api_hash=config['api_hash'],
              bot_token=config['bot_token'])
 
-app.proxy = {
-    "scheme": "http",
-    'hostname': '127.0.0.1',
-    'port': 10801
-}
+if config['proxy']['status']:
+    app.proxy = {
+        "scheme": config['proxy']['scheme'],
+        'hostname': config['proxy']['hostname'],
+        'port': config['proxy']['port']
+    }
 
 
 async def tgs_convert(tgs_path, target_path, width=None, height=None, fps=60, quality=100, target_type=TargetType.Gif):

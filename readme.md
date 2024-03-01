@@ -62,6 +62,7 @@ chmod +777 ./TgStoGif -R
 ```bash
 pip install -r requirements.txt
 ```
+#### 3. Configure the cofing.json file
 
 #### 3. Run the script
 
