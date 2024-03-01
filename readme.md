@@ -1,6 +1,15 @@
-<center><img src="./images/img_3.gif" width="256px"></center>  
+<p align="center">
+    <img src="./images/img_3.gif" width="256px">
 
-### System Requirements
+</p>
+<p align="center">
+    <img src="https://img.shields.io/badge/Python-3.11-blue">
+    <a href="//julym.com/"><img src="https://img.shields.io/badge/Site-julym.com-red"></a>
+    <img src="https://img.shields.io/badge/version-1.0.0-yellow">
+    <a href="//github.com/SwaggyMacro/TgStoGifBot"><img src="https://img.shields.io/badge/Repo-TgStoGifBot-green"></a>
+</p>
+
+### 📝 System Requirements
 ---
 Install run-time dependencies. Make sure the path to them present in PATH variable:
 
@@ -26,7 +35,7 @@ want to convert to APNG or WEBP.
     - You may need to install [GTk3](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases)
       runtime for lottie to work properly in windows(`reboot required`).
 
-### How to use
+### 🖥️ How to use
 ---
 
 #### 0. You may need permission to execute, read, write the script
@@ -60,13 +69,13 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### ScreenShot
+### 🖼️ScreenShot
 ---
 ![Screenshot](./images/img.png)
 ![Screenshot](./images/img_1.png)
 ![Screenshot](./images/img_2.png)
 
-### Related Repositories
+### 🔗 Related Repositories
 ---
 - [lottie-converter](https://github.com/ed-asriyan/lottie-converter) - Convert Lottie animations to GIF, APNG, and WebP.
 - [lottie](https://gitlab.com/mattbas/python-lottie) - Render After Effects animations natively on Web, Android and iOS,
