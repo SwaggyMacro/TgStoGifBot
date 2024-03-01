@@ -2,6 +2,7 @@ import json
 import os
 import platform
 import shutil
+import traceback
 
 import pyrogram.errors.exceptions.flood_420
 from pyrogram import Client, raw
@@ -63,7 +64,8 @@ async def tgs_convert(tgs_path, target_path, width=None, height=None, fps=60, qu
         height = animation.height
     # exec .sh
     logger.info(
-        f"bash {TargetType.ScriptPath[target_type]} --output {target_path} --height {height} --width {width} --fps {fps} --quality {quality} {tgs_path}")
+        f"bash {TargetType.ScriptPath[target_type]} --output {target_path} --height {height} --width {width}"
+        f" --fps {fps} --quality {quality} {tgs_path}")
     subprocess.run(['bash', TargetType.ScriptPath[target_type], '--output', str(target_path), '--height',
                     str(height), '--width', str(width), '--fps', str(fps), '--quality', str(quality), tgs_path])
     # the following code will make the gif file motion freak
@@ -104,6 +106,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
                 short_name=sticker_set_name), hash=0))
         except Exception as e:
             logger.error(f"Failed to get sticker set {sticker_set_name} with error {e}")
+            traceback.print_exc()
             await message.reply_text(f"Failed to get sticker set {sticker_set_name} with error {e}")
             return
 
@@ -116,6 +119,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
                 sticker = await Sticker._parse(app, stk, {type(i): i for i in stk.attributes})
             except Exception as e:
                 logger.error(f"Failed to parse sticker {index}:{stk} with error {e}")
+                traceback.print_exc()
                 await message.reply_text(f"Failed to parse sticker {index + 1}:{sticker_set_name} with error {e}")
                 return
             sticker_set.append(sticker)
@@ -131,6 +135,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
                                             file_name=f"{stk_tmp_path}/{sticker.file_unique_id}.tgs")
             except Exception as e:
                 logger.error(f"Failed to download sticker {index}:{sticker.file_id} with error {e}")
+                traceback.print_exc()
                 await message.reply_text(f"Failed to download sticker {index}:{sticker.file_id} with error {e}")
                 continue
 
@@ -149,6 +154,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
                 await tgs_convert(f"{stk_tmp_path}/{stk.file_unique_id}.tgs", gif_file_path)
             except Exception as e:
                 logger.error(f"Failed to convert sticker {stk.file_id} to gif with error {e}")
+                traceback.print_exc()
                 await message.reply_text(f"Failed to convert sticker {stk.file_id} to gif with error {e}")
                 continue
 
@@ -172,12 +178,14 @@ async def sticker_set_to_gif(client: Client, message: Message):
         await message.reply_text(f"Error: {e.MESSAGE}")
     except Exception as e:
         logger.error(f"Error: {e}")
+        traceback.print_exc()
         await message.reply_text(f"Error: {e}")
     finally:
         try:
             shutil.rmtree(stk_tmp_path)
         except Exception as e:
             logger.error(f"Delete tmp_sticker_path:{stk_tmp_path} failed: {e}")
+            traceback.print_exc()
 
 
 @app.on_message(filters.sticker)
@@ -223,12 +231,14 @@ async def sticker_to_gif(client: Client, message: Message):
         await message.reply_text(f"Error: {e.MESSAGE}")
     except Exception as e:
         logger.error(f"Error: {e}")
+        traceback.print_exc()
         await message.reply_text(f"Error: {e}")
     finally:
         try:
             shutil.rmtree(stk_tmp_path)
         except Exception as e:
             logger.error(f"Delete tmp_sticker_path:{stk_tmp_path} failed: {e}")
+            traceback.print_exc()
 
 
 app.run()
