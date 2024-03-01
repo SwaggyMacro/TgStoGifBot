@@ -199,7 +199,8 @@ async def sticker_to_gif(client: Client, message: Message):
                 file_name=f"{stk_tmp_path}/{message.sticker.file_unique_id}.tgs")
             logger.info(f"Downloaded sticker to {tgs_file_path}")
             await message.reply_text(
-                f"Downloaded sticker of {tgs_file_path}, Converting to gif, It may take a while...")
+                f"Downloaded sticker of {message.sticker.emoji}-{message.sticker.file_unique_id}, Converting to gif, "
+                f"It may take a while...")
             if not os.path.exists(stk_tmp_path):
                 os.makedirs(stk_tmp_path)
             gif_file_path = f"{stk_tmp_path}/{message.sticker.file_unique_id}.gif"
