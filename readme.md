@@ -44,8 +44,10 @@ want to convert to APNG or WEBP.
 chmod +777 ./TgStoGif -R
 ```
 
-#### 1. Request the API from Telegram
-
+#### 1. Create a bot and Request the API from Telegram
+- Create a bot using [BotFather](https://t.me/BotFather).
+    - Copy the bot token and save it for later.
+    - here's a [guide](https://core.telegram.org/bots#6-botfather) on how to create a bot.
 - Go to [Telegram API](https://my.telegram.org/auth) and log in.
 - Click on the `API development tools` link.
 - A `Create new application` window will appear. Fill in your application details. There is no need to enter any URL,
