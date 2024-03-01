@@ -4,7 +4,8 @@
 </p>
 <p align="center">
     <img src="https://img.shields.io/badge/Python-3.11-blue">
-    <a href="//julym.com/"><img src="https://img.shields.io/badge/Site-julym.com-red"></a>
+    <a href="readme_cn.md"><img src="https://img.shields.io/badge/Lang-简体中文-red"></a>
+    <a href="//julym.com/"><img src="https://img.shields.io/badge/Site-julym.com-pink"></a>
     <img src="https://img.shields.io/badge/version-1.0.0-yellow">
     <a href="//github.com/SwaggyMacro/TgStoGifBot"><img src="https://img.shields.io/badge/Repo-TgStoGifBot-green"></a>
 </p>
