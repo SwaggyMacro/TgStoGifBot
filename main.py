@@ -77,7 +77,7 @@ async def start(client: Client, message: Message):
     await message.reply_text(
         "Hello! I can convert stickers to gifs. Send me a sticker and I will convert it to a gif for you.\n"
         "Only `animated stickers` are supported.\n"
-        "Open source on ![Github](https://github.com/SwaggyMacro/TgStoGifBot)", parse_mode=enums.ParseMode.MARKDOWN)
+        "Open source on [Github](https://github.com/SwaggyMacro/TgStoGifBot)", parse_mode=enums.ParseMode.MARKDOWN)
 
 
 @app.on_message(filters.command("help"))
@@ -93,7 +93,7 @@ async def on_about(client: Client, message: Message):
     await message.reply_text(
         "Stickers To Gifs Bot\n"
         "`Version`: 1.0.0\n"
-        "`Github`: ![Github/SwaggyMacro/TgStoGifBot](https://github.com/SwaggyMacro/TgStoGifBot)",
+        "`Github`: [Github/SwaggyMacro/TgStoGifBot](https://github.com/SwaggyMacro/TgStoGifBot)",
         parse_mode=enums.ParseMode.MARKDOWN
     )
 
