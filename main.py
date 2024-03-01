@@ -193,6 +193,8 @@ async def sticker_set_to_gif(client: Client, message: Message):
         traceback.print_exc()
         await message.reply_text(f"Error: {e}")
     finally:
+        if stk_tmp_path is None:
+            return
         try:
             shutil.rmtree(stk_tmp_path)
         except Exception as e:
@@ -246,6 +248,8 @@ async def sticker_to_gif(client: Client, message: Message):
         traceback.print_exc()
         await message.reply_text(f"Error: {e}")
     finally:
+        if stk_tmp_path is None:
+            return
         try:
             shutil.rmtree(stk_tmp_path)
         except Exception as e:
