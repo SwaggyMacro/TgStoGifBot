@@ -63,8 +63,23 @@ chmod +777 ./TgStoGif -R
 pip install -r requirements.txt
 ```
 #### 3. Configure the cofing.json file
+- copy the `config.json.example` file to `config.json` and fill in the required fields.
 
-#### 3. Run the script
+```json
+{
+  "bot_name": "your_bot_name",
+  "api_id": "your_api_id",
+  "api_hash": "your_api_hash",
+  "bot_token": "your_bot_token",
+  "proxy": {
+    "status": "False", // "True" if you want to use a proxy, "False" if you don't want to use a proxy, and fill in the proxy details below, `without this note`.
+    "scheme": "http",
+    "hostname": "your_proxy_hostname",
+    "port": "your_proxy_port"
+  }
+}
+```
+#### 4. Run the script
 
 - Run the script using the following command:
 ```bash
