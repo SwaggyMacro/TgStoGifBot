@@ -1,7 +1,7 @@
 <center><img src="./images/img_3.gif" width="256px"></center>  
 
 ### System Requirements
-
+---
 Install run-time dependencies. Make sure the path to them present in PATH variable:
 
 - **[gifski](https://gif.ski)** if you want to convert to GIF
@@ -61,13 +61,13 @@ python main.py
 ```
 
 ### ScreenShot
-
+---
 ![Screenshot](./images/img.png)
 ![Screenshot](./images/img_1.png)
 ![Screenshot](./images/img_2.png)
 
 ### Related Repositories
-
+---
 - [lottie-converter](https://github.com/ed-asriyan/lottie-converter) - Convert Lottie animations to GIF, APNG, and WebP.
 - [lottie](https://gitlab.com/mattbas/python-lottie) - Render After Effects animations natively on Web, Android and iOS,
   and React Native.
