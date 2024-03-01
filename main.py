@@ -5,7 +5,7 @@ import shutil
 import traceback
 
 import pyrogram.errors.exceptions.flood_420
-from pyrogram import Client, raw
+from pyrogram import Client, raw, enums
 from pyrogram import filters
 from loguru import logger
 
@@ -75,7 +75,9 @@ async def tgs_convert(tgs_path, target_path, width=None, height=None, fps=60, qu
 @app.on_message(filters.command("start"))
 async def start(client: Client, message: Message):
     await message.reply_text(
-        "Hello! I can convert stickers to gifs. Send me a sticker and I will convert it to a gif for you.")
+        "Hello! I can convert stickers to gifs. Send me a sticker and I will convert it to a gif for you.\n"
+        "Only `animated stickers` are supported.\n"
+        "Open source on ![Github](https://github.com/SwaggyMacro/TgStoGifBot)", parse_mode=enums.ParseMode.MARKDOWN)
 
 
 @app.on_message(filters.command("help"))
@@ -83,8 +85,17 @@ async def on_help(client: Client, message: Message):
     await message.reply_text(
         "1. Send me a sticker and I will convert it to a gif for you. \n"
         "2. You can also use /sets to convert a sticker set to gif. \n"
-        "    Example: /sets https://t.me/addstickers/GumLoveIs \n")
+        "    `Example`: /sets https://t.me/addstickers/GumLoveIs \n")
 
+
+@app.on_message(filters.command("about"))
+async def on_about(client: Client, message: Message):
+    await message.reply_text(
+        "Stickers To Gifs Bot\n"
+        "`Version`: 1.0.0\n"
+        "`Github`: ![Github/SwaggyMacro/TgStoGifBot](https://github.com/SwaggyMacro/TgStoGifBot)",
+        parse_mode=enums.ParseMode.MARKDOWN
+    )
 
 @app.on_message(filters.command("sets"))
 async def sticker_set_to_gif(client: Client, message: Message):
@@ -95,7 +106,8 @@ async def sticker_set_to_gif(client: Client, message: Message):
         if "t.me/addstickers/" in sticker_set_name:
             sticker_set_name = sticker_set_name.split("/")[-1]
         else:
-            await message.reply_text("Please send a link of sticker set or sticker!")
+            await message.reply_text("Please send a link of sticker set or sticker!\n"
+                                     "For example: /sets https://t.me/addstickers/GumLoveIs")
             return
 
         logger.info(f"Getting the sticker set of {sticker_set_name}.")
