@@ -69,8 +69,8 @@ python main.py
 ```
 
 #### 4. Talk to the bot
-- Send a sticker to the bot and it will convert it to a gif and send it back to you.
-- Send a StickerSet link to the bot and it will convert all the stickers in the set to gif and zip it then send it back to you.
+- Send a sticker to the bot, and it will convert it to a gif and send it back to you.
+- Send a StickerSet link to the bot, and it will convert all the stickers in the set to gif and zip it then send it back to you.
 
 
 ### 🖼️ScreenShot
