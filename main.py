@@ -88,6 +88,7 @@ async def on_help(client: Client, message: Message):
 async def sticker_set_to_gif(client: Client, message: Message):
     stk_tmp_path = None
     try:
+        logger.info(f"{message.from_user.username}#{message.from_user.id}: Sent Request.")
         sticker_set_name = message.text
         if "t.me/addstickers/" in sticker_set_name:
             sticker_set_name = sticker_set_name.split("/")[-1]
@@ -184,6 +185,7 @@ async def sticker_to_gif(client: Client, message: Message):
     stk_tmp_path = None
     try:
         if message.sticker:
+            logger.info(f"{message.from_user.username}#{message.from_user.id}: Sent Request.")
             logger.info(f"Converting sticker to gif for {message.sticker.file_id}")
             await message.reply_text(
                 f"Converting sticker to gif for {message.sticker.set_name}：{message.sticker.emoji}")
