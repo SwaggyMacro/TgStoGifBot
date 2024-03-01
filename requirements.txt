@@ -1,0 +1,4 @@
+loguru==0.7.2
+lottie==0.7.0
+Pyrogram==2.0.106
+tgcrypto
