@@ -134,6 +134,10 @@ async def sticker_set_to_gif(client: Client, message: Message):
                 traceback.print_exc()
                 await message.reply_text(f"Failed to parse sticker {index + 1}:{sticker_set_name} with error {e}")
                 return
+            if not sticker.is_animated:
+                logger.warning(f"Only `animated stickers` are supported, skip {index}:{sticker.file_id}")
+                await message.reply_text(f"Only `animated stickers` are supported, skip {index + 1}:{sticker.file_id}")
+                continue
             sticker_set.append(sticker)
             stk_tmp_path = f"tmp/{sticker.set_name}-{message.from_user.id}"
             if not os.path.exists(stk_tmp_path):
@@ -207,6 +211,11 @@ async def sticker_to_gif(client: Client, message: Message):
     stk_tmp_path = None
     try:
         if message.sticker:
+            if not message.sticker.is_animated:
+                logger.warning(f"{message.from_user.username}#{message.from_user.id}: Only `animated stickers` are "
+                               f"supported.")
+                await message.reply_text("Only `animated stickers` are supported.")
+                return
             logger.info(f"{message.from_user.username}#{message.from_user.id}: Sent Request.")
             logger.info(f"Converting sticker to gif for {message.sticker.file_id}")
             await message.reply_text(
@@ -230,7 +239,7 @@ async def sticker_to_gif(client: Client, message: Message):
             logger.info(f"Converted sticker to gif, Uploading gif of {gif_file_path}.")
             await message.reply_text(f"Converted sticker to gif, Uploading .gif, It may take a while...")
             # zip the gif file
-            gif_file_path_zip = f"{stk_tmp_path}/{message.sticker.file_unique_id}.zip"
+            gif_file_path_zip = f"{stk_tmp_path}/{message.sticker.set_name}_{message.sticker.file_unique_id}.zip"
             with zipfile.ZipFile(gif_file_path_zip, 'w') as z:
                 z.write(gif_file_path, os.path.basename(gif_file_path))
             # upload the gif
