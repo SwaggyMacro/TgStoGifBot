@@ -155,7 +155,8 @@ async def sticker_set_to_gif(client: Client, message: Message):
                                                     file_name=f"{stk_tmp_path}/{sticker.file_unique_id}.tgs")
                     except FloodWait as e:
                         logger.error(f"Error: {e.MESSAGE}")
-                        await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds.",
+                        await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds, and "
+                                                 f"retry in {retry_times + 1} times.",
                                                  parse_mode=enums.ParseMode.MARKDOWN)
                         await asyncio.sleep(e.value)
             except Exception as e:
@@ -241,11 +242,12 @@ async def sticker_to_gif(client: Client, message: Message):
                         file_name=f"{stk_tmp_path}/{message.sticker.file_unique_id}.tgs")
                     logger.info(f"Downloaded sticker to {tgs_file_path}")
                     await message.reply_text(
-                        f"Downloaded sticker of {message.sticker.emoji}-{message.sticker.file_unique_id}, Converting to gif, "
-                        f"It may take a while...")
+                        f"Downloaded sticker of {message.sticker.emoji}-{message.sticker.file_unique_id}, Converting "
+                        f"to gif, It may take a while...")
                 except FloodWait as e:
                     logger.error(f"Error: {e.MESSAGE}")
-                    await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds.",
+                    await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds, and "
+                                             f"retry in {retry_times + 1} times.",
                                              parse_mode=enums.ParseMode.MARKDOWN)
                     await asyncio.sleep(e.value)
             if not os.path.exists(stk_tmp_path):
