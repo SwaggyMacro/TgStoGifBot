@@ -196,14 +196,13 @@ async def sticker_set_to_gif(client: Client, message: Message):
         logger.error(f"Error: {e}")
         traceback.print_exc()
         await message.reply_text(f"Error: {e}")
-    finally:
-        if stk_tmp_path is None:
-            return
-        try:
-            shutil.rmtree(stk_tmp_path)
-        except Exception as e:
-            logger.error(f"Delete tmp_sticker_path:{stk_tmp_path} failed: {e}")
-            traceback.print_exc()
+    if stk_tmp_path is None:
+        return
+    try:
+        shutil.rmtree(stk_tmp_path)
+    except Exception as e:
+        logger.error(f"Delete tmp_sticker_path:{stk_tmp_path} failed: {e}")
+        traceback.print_exc()
 
 
 @app.on_message(filters.sticker)
@@ -255,15 +254,13 @@ async def sticker_to_gif(client: Client, message: Message):
     except Exception as e:
         logger.error(f"Error: {e}")
         traceback.print_exc()
-        await message.reply_text(f"Error: {e}")
-    finally:
-        if stk_tmp_path is None:
-            return
-        try:
-            shutil.rmtree(stk_tmp_path)
-        except Exception as e:
-            logger.error(f"Delete tmp_sticker_path:{stk_tmp_path} failed: {e}")
-            traceback.print_exc()
+    if stk_tmp_path is None:
+        return
+    try:
+        shutil.rmtree(stk_tmp_path)
+    except Exception as e:
+        logger.error(f"Delete tmp_sticker_path:{stk_tmp_path} failed: {e}")
+        traceback.print_exc()
 
 
 app.run()
