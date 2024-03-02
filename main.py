@@ -8,7 +8,8 @@ import pyrogram.errors.exceptions.flood_420
 from pyrogram import Client, raw, enums
 from pyrogram import filters
 from loguru import logger
-
+import asyncio
+from pyrogram.errors import FloodWait
 import subprocess
 from lottie import parsers
 import zipfile
@@ -97,6 +98,7 @@ async def on_about(client: Client, message: Message):
         parse_mode=enums.ParseMode.MARKDOWN
     )
 
+
 @app.on_message(filters.command("sets"))
 async def sticker_set_to_gif(client: Client, message: Message):
     stk_tmp_path = None
@@ -143,12 +145,19 @@ async def sticker_set_to_gif(client: Client, message: Message):
             if not os.path.exists(stk_tmp_path):
                 os.makedirs(stk_tmp_path)
             try:
-                if index % 10 == 0:
-                    await message.reply_text(f"Downloading sticker {index}:{sticker.emoji}, "
-                                             f"set_name: {sticker.set_name}, count: {len(info.documents)}.")
-                logger.info(f"{index}: Downloading sticker to {stk_tmp_path}-{sticker.file_unique_id}.tgs")
-                await client.download_media(sticker.file_id,
-                                            file_name=f"{stk_tmp_path}/{sticker.file_unique_id}.tgs")
+                for retry_times in range(3):
+                    try:
+                        if index % 10 == 0:
+                            await message.reply_text(f"Downloading sticker {index}:{sticker.emoji}, "
+                                                     f"set_name: {sticker.set_name}, count: {len(info.documents)}.")
+                        logger.info(f"{index}: Downloading sticker to {stk_tmp_path}-{sticker.file_unique_id}.tgs")
+                        await client.download_media(sticker.file_id,
+                                                    file_name=f"{stk_tmp_path}/{sticker.file_unique_id}.tgs")
+                    except FloodWait as e:
+                        logger.error(f"Error: {e.MESSAGE}")
+                        await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds.",
+                                                 parse_mode=enums.ParseMode.MARKDOWN)
+                        await asyncio.sleep(e.value)
             except Exception as e:
                 logger.error(f"Failed to download sticker {index}:{sticker.file_id} with error {e}")
                 traceback.print_exc()
@@ -225,12 +234,20 @@ async def sticker_to_gif(client: Client, message: Message):
             # download the sticker
             await message.reply_text(f"Downloading sticker to convert to gif, It may take a while...")
             stk_tmp_path = f"tmp/{message.sticker.set_name}-{message.from_user.id}-{message.sticker.file_unique_id}"
-            tgs_file_path = await message.download(
-                file_name=f"{stk_tmp_path}/{message.sticker.file_unique_id}.tgs")
-            logger.info(f"Downloaded sticker to {tgs_file_path}")
-            await message.reply_text(
-                f"Downloaded sticker of {message.sticker.emoji}-{message.sticker.file_unique_id}, Converting to gif, "
-                f"It may take a while...")
+            tgs_file_path = None
+            for retry_times in range(3):
+                try:
+                    tgs_file_path = await message.download(
+                        file_name=f"{stk_tmp_path}/{message.sticker.file_unique_id}.tgs")
+                    logger.info(f"Downloaded sticker to {tgs_file_path}")
+                    await message.reply_text(
+                        f"Downloaded sticker of {message.sticker.emoji}-{message.sticker.file_unique_id}, Converting to gif, "
+                        f"It may take a while...")
+                except FloodWait as e:
+                    logger.error(f"Error: {e.MESSAGE}")
+                    await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds.",
+                                             parse_mode=enums.ParseMode.MARKDOWN)
+                    await asyncio.sleep(e.value)
             if not os.path.exists(stk_tmp_path):
                 os.makedirs(stk_tmp_path)
             gif_file_path = f"{stk_tmp_path}/{message.sticker.file_unique_id}.gif"
@@ -247,10 +264,6 @@ async def sticker_to_gif(client: Client, message: Message):
                                                  f"@StoGifsBot.\n"
                                                  f"https://t.me/addstickers/{message.sticker.set_name}")
             logger.info(f"Uploaded gif of {gif_file_path}")
-
-    except pyrogram.errors.exceptions.flood_420.FloodWait as e:
-        logger.error(f"Error: {e.MESSAGE}")
-        await message.reply_text(f"Error: {e.MESSAGE}")
     except Exception as e:
         logger.error(f"Error: {e}")
         traceback.print_exc()
