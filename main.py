@@ -153,6 +153,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
                         logger.info(f"{index}: Downloading sticker to {stk_tmp_path}-{sticker.file_unique_id}.tgs")
                         await client.download_media(sticker.file_id,
                                                     file_name=f"{stk_tmp_path}/{sticker.file_unique_id}.tgs")
+                        break
                     except FloodWait as e:
                         logger.error(f"Error: {e.MESSAGE}")
                         await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds, and "
@@ -244,6 +245,7 @@ async def sticker_to_gif(client: Client, message: Message):
                     await message.reply_text(
                         f"Downloaded sticker of {message.sticker.emoji}-{message.sticker.file_unique_id}, Converting "
                         f"to gif, It may take a while...")
+                    break
                 except FloodWait as e:
                     logger.error(f"Error: {e.MESSAGE}")
                     await message.reply_text(f"Error: {e.MESSAGE}, `Rated limit`, sleep {e.value} seconds, and "
