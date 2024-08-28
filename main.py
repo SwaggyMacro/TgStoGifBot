@@ -87,7 +87,8 @@ async def on_help(client: Client, message: Message):
     await message.reply_text(
         "1. Send me a sticker and I will convert it to a gif for you. \n"
         "2. You can also use /sets to convert a sticker set to gif. \n"
-        "    `Example`: /sets https://t.me/addstickers/GumLoveIs \n")
+        "    `Example`: /sets https://t.me/addstickers/GumLoveIs 256x256\n"
+        "     **256x256 is the size option, default is original size if you didn't provide.**\n")
 
 
 @app.on_message(filters.command("about"))
