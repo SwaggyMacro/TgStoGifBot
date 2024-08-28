@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import re
 import shutil
 import traceback
 
@@ -104,16 +105,34 @@ async def sticker_set_to_gif(client: Client, message: Message):
     stk_tmp_path = None
     try:
         logger.info(f"{message.from_user.username}#{message.from_user.id}: Sent Request.")
-        sticker_set_name = message.text
-        if "t.me/addstickers/" in sticker_set_name:
-            sticker_set_name = sticker_set_name.split("/")[-1]
-        else:
+
+        # get size of the sticker set from the message, format: /sets https://t.me/addstickers/GumLoveIs 256x256
+        sticker_set_name = None
+
+        # regex for sticker set name
+        re_expression = r"t.me/addstickers/([a-zA-Z0-9_]+)"
+        match = re.search(re_expression, message.text)
+        if match:
+            sticker_set_name = match.group(1).split("/")[-1]
+        if not sticker_set_name:
             await message.reply_text("Please send a link of sticker set or sticker!\n"
                                      "For example: /sets https://t.me/addstickers/GumLoveIs")
             return
 
-        logger.info(f"Getting the sticker set of {sticker_set_name}.")
-        await message.reply_text(f"Getting the sticker set of {sticker_set_name}.")
+        # regex for size
+        re_expression = r"(\d+)x(\d+)"
+        match = re.search(re_expression, message.text)
+        if match:
+            width = int(match.group(1))
+            height = int(match.group(2))
+        else:
+            width = None
+            height = None
+
+        logger.info(f"Getting the sticker set of {sticker_set_name}, "
+                    f"size: {width if type(width) is int else 'Original'}x{height if type(width) is int else 'Original'}.")
+        await message.reply_text(f"Getting the sticker set of {sticker_set_name}, "
+                                 f"size: {width if type(width) is int else 'Original'}x{height if type(width) is int else 'Original'}.")
 
         try:
             info = await app.invoke(raw.functions.messages.GetStickerSet(stickerset=raw.types.InputStickerSetShortName(
@@ -178,7 +197,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
                 if index % 10 == 0:
                     await message.reply_text(f"Converting sticker {index + 1}:{stk.emoji}, "
                                              f"set_name: {stk.set_name}, count: {len(sticker_set)}")
-                await tgs_convert(f"{stk_tmp_path}/{stk.file_unique_id}.tgs", gif_file_path)
+                await tgs_convert(f"{stk_tmp_path}/{stk.file_unique_id}.tgs", gif_file_path, width=width, height=height)
             except Exception as e:
                 logger.error(f"Failed to convert sticker {stk.file_id} to gif with error {e}")
                 traceback.print_exc()
