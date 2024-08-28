@@ -87,8 +87,9 @@ async def on_help(client: Client, message: Message):
     await message.reply_text(
         "1. Send me a sticker and I will convert it to a gif for you. \n"
         "2. You can also use /sets to convert a sticker set to gif. \n"
-        "    `Example`: /sets https://t.me/addstickers/GumLoveIs 256x256\n"
-        "     **256x256 is the size option, default is original size if you didn't provide.**\n")
+        "    `Example`: /sets https://t.me/addstickers/GumLoveIs 256x256x100\n"
+        "     **256x256x100 is the size option, default is original size with quality 100 if you didn't provide.**\n")
+
 
 
 @app.on_message(filters.command("about"))
@@ -107,7 +108,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
     try:
         logger.info(f"{message.from_user.username}#{message.from_user.id}: Sent Request.")
 
-        # get size of the sticker set from the message, format: /sets https://t.me/addstickers/GumLoveIs 256x256
+        # get size of the sticker set from the message, format: /sets https://t.me/addstickers/GumLoveIs 256x256x100
         sticker_set_name = None
 
         # regex for sticker set name
@@ -117,23 +118,33 @@ async def sticker_set_to_gif(client: Client, message: Message):
             sticker_set_name = match.group(1).split("/")[-1]
         if not sticker_set_name:
             await message.reply_text("Please send a link of sticker set or sticker!\n"
-                                     "For example: /sets https://t.me/addstickers/GumLoveIs")
+                                     "For example: /sets https://t.me/addstickers/GumLoveIs 256x256x100"
+                                     "             256x256x100: size 256x256, quality 100. 0x0 is for original size."
+                                     "             default is Original size with quality 100."
+                                     "Only `animated stickers` are supported.")
             return
 
-        # regex for size
-        re_expression = r"(\d+)x(\d+)"
+        # regex for size, 256x256x100, 256x256 is size, 100 is the quality, default is 100, could be ignored.
+        # 0x0 is original size.
+        re_expression = r"(\d+)x(\d+)(x(\d+))?"
         match = re.search(re_expression, message.text)
+        width = None
+        height = None
+        quality = 100
         if match:
             width = int(match.group(1))
             height = int(match.group(2))
-        else:
-            width = None
-            height = None
+            if match.group(4):
+                quality = int(match.group(4))
+
+
 
         logger.info(f"Getting the sticker set of {sticker_set_name}, "
-                    f"size: {width if type(width) is int else 'Original'}x{height if type(width) is int else 'Original'}.")
+                    f"size: {width if type(width) is int else 'Original'}x{height if type(width) is int else 'Original'}"
+                    f"x{quality}.")
         await message.reply_text(f"Getting the sticker set of {sticker_set_name}, "
-                                 f"size: {width if type(width) is int else 'Original'}x{height if type(width) is int else 'Original'}.")
+                                 f"size: {width if type(width) is int else 'Original'}"
+                                 f"x{height if type(width) is int else 'Original'}x{quality}.")
 
         try:
             info = await app.invoke(raw.functions.messages.GetStickerSet(stickerset=raw.types.InputStickerSetShortName(
@@ -198,7 +209,8 @@ async def sticker_set_to_gif(client: Client, message: Message):
                 if index % 10 == 0:
                     await message.reply_text(f"Converting sticker {index + 1}:{stk.emoji}, "
                                              f"set_name: {stk.set_name}, count: {len(sticker_set)}")
-                await tgs_convert(f"{stk_tmp_path}/{stk.file_unique_id}.tgs", gif_file_path, width=width, height=height)
+                await tgs_convert(f"{stk_tmp_path}/{stk.file_unique_id}.tgs", gif_file_path, width=width,
+                                  height=height, quality=quality)
             except Exception as e:
                 logger.error(f"Failed to convert sticker {stk.file_id} to gif with error {e}")
                 traceback.print_exc()

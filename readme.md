@@ -91,6 +91,12 @@ python main.py
 - Send a sticker to the bot, and it will convert it to a gif and send it back to you.
 - Send a StickerSet link to the bot, and it will convert all the stickers in the set to gif and zip it then send it back to you.
 
+For example, you can use the following sticker set link to test the bot:
+```
+/sets https://t.me/addstickers/PeopleMemes 256x256x100
+```
+`256x256x100` is the size of the gif, and the quality, you can change it to any size you want.
+default is original size and quality 100, if you didn't provide the size and quality.
 
 ### 🖼️ScreenShot
 ---
