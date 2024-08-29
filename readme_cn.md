@@ -100,6 +100,7 @@ python main.py
 ![截图](./images/img.png)
 ![截图](./images/img_1.png)
 ![截图](./images/img_2.png)
+![截图](./images/img_4.png)
 
 ### 🔗 相关仓库
 ---
