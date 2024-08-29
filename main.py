@@ -224,8 +224,7 @@ async def sticker_set_to_gif(client: Client, message: Message):
         with zipfile.ZipFile(gif_file_path_zip, 'w') as z:
             for stk in sticker_set:
                 gif_file_path = f"{stk_tmp_path}/{stk.file_unique_id}.gif"
-                z.write(gif_file_path, f"{sticker_set_name}/gif/{stk.file_unique_id}.gif")
-                z.write(f"{stk_tmp_path}/{stk.file_unique_id}.tgs", f"{sticker_set_name}/tgs/{stk.file_unique_id}.tgs")
+                z.write(gif_file_path, os.path.basename(gif_file_path))
 
         # upload the gif
         logger.info(f"Zipped, Uploading gif of {sticker_set_name}")
@@ -294,9 +293,7 @@ async def sticker_to_gif(client: Client, message: Message):
             # zip the gif file
             gif_file_path_zip = f"{stk_tmp_path}/{message.sticker.set_name}_{message.sticker.file_unique_id}.zip"
             with zipfile.ZipFile(gif_file_path_zip, 'w') as z:
-                z.write(gif_file_path, f"{message.sticker.set_name}/gif/{message.sticker.file_unique_id}.gif")
-                z.write(tgs_file_path, f"{message.sticker.set_name}/tgs/{message.sticker.file_unique_id}.tgs")
-
+                z.write(gif_file_path, os.path.basename(gif_file_path))
             # upload the gif
             await message.reply_document(gif_file_path_zip,
                                          caption=f"{message.sticker.emoji}: Task Completed, Credits: "
