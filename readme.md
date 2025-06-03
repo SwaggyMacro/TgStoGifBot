@@ -49,13 +49,7 @@ chmod +777 ./TgStoGif -R
 - Create a bot using [BotFather](https://t.me/BotFather).
     - Copy the bot token and save it for later.
     - here's a [guide](https://core.telegram.org/bots#6-botfather) on how to create a bot.
-- Go to [Telegram API](https://my.telegram.org/auth) and log in.
-- Click on the `API development tools` link.
-- A `Create new application` window will appear. Fill in your application details. There is no need to enter any URL,
-  and only the first two fields (App title and Short name) can currently be changed later.
-- Click on `Create application` at the end.
-- Copy `api_id`, `api_hash`, `bot_token`(from `@BotFather`) and paste them in the `config.json` file.
-
+  
 #### 2. Install the required dependencies
 
 - Install the required dependencies using the following command:
@@ -68,15 +62,17 @@ pip install -r requirements.txt
 
 ```json
 {
-  "bot_name": "your_bot_name",
-  "api_id": "your_api_id",
-  "api_hash": "your_api_hash",
-  "bot_token": "your_bot_token",
+  "bot_name": "Bot name",
+  "bot_token": "from @BotFather",
+  "convert_workers": 5,
+  "download_workers": 5,
   "proxy": {
-    "status": "False", // "True" if you want to use a proxy, "False" if you don't want to use a proxy, and fill in the proxy details below, `without this note`.
-    "scheme": "http",
-    "hostname": "your_proxy_hostname",
-    "port": "your_proxy_port"
+    "status": true, //true if you want to use a proxy, "False" if you don't want to use a proxy, and fill in the proxy details below, `without this note`.
+    "type": "http",
+    "host": "127.0.0.1",
+    "port": 10803,
+    "username": "",
+    "password": ""
   }
 }
 ```
@@ -93,18 +89,16 @@ python main.py
 
 For example, you can use the following sticker set link to test the bot:
 ```
-/sets https://t.me/addstickers/PeopleMemes 256x256x100
+/sets https://t.me/addstickers/PeopleMemes
 ```
-`256x256x100` is the size of the gif, and the quality, you can change it to any size you want.
-default is original size and quality 100, if you didn't provide the size and quality.
 
 ### 🖼️ScreenShot
 ---
 ![Screenshot](./images/img.png)
 ![Screenshot](./images/img_1.png)
 ![Screenshot](./images/img_2.png)
-![Screenshot](./images/img_4.png)
 
+https://github.com/user-attachments/assets/a8cf5c0a-37bd-42f5-ba48-fa24fdbc2e18
 
 ### 🔗 Related Repositories
 ---

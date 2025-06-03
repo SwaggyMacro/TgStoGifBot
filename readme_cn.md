@@ -47,12 +47,6 @@ chmod +777 ./TgStoGif -R
 - 通过[BotFather](https://t.me/BotFather)创建一个机器人。
     - 复制机器人令牌并保存以备后用。
     - 这里有一个如何创建机器人的[指南](https://core.telegram.org/bots#6-botfather)。
-- 登陆[Telegram API](https://my.telegram.org/auth)。
-- 点击`API development tools`链接。
-- 将出现一个`Create new application`窗口。填写你的应用详情。无需输入任何URL，
-  目前只有前两个字段（应用标题和简称）可以稍后更改。
-- 点击最后的`Create application`。
-- 复制`api_id`、`api_hash`、`bot_token`(来自`@BotFather`)并将它们粘贴在`config.json`文件中。
 
 #### 2. 安装所需的依赖
 
@@ -65,15 +59,17 @@ pip install -r requirements.txt
 - 将`config.json.example`文件复制为`config.json`并填写所需字段。
 ```json
 {
-  "bot_name": "你的机器人名字",
-  "api_id": "你的api_id",
-  "api_hash": "你的api_hash",
+  "bot_name": "Bot name",
   "bot_token": "你的机器人令牌",
+  "convert_workers": 5,
+  "download_workers": 5,
   "proxy": {
-    "status": "False", // "True" 如果你想使用代理， "False" 如果你不想使用代理，并填写下面的代理详情，记得删掉这条注释。
-    "scheme": "http",
-    "hostname": "你的代理主机名",
-    "port": "你的代理端口"
+    "status": true, // "True" 如果你想使用代理， "False" 如果你不想使用代理，并填写下面的代理详情，记得删掉这条注释。
+    "type": "http",
+    "host": "127.0.0.1",
+    "port": 10803,
+    "username": "",
+    "password": ""
   }
 }
 ```
@@ -86,10 +82,8 @@ python main.py
 
 示例，你可以使用以下表情包链接来测试机器人：
 ```
-/sets https://t.me/addstickers/PeopleMemes 256x256x100
+/sets https://t.me/addstickers/PeopleMemes
 ```
-`256x256x100`是gif的大小和质量，你可以将其更改为任何你想要的大小。
-如果你没有提供大小和质量，默认是原始大小和质量100。
 
 #### 5. 与机器人对话
 - 发送表情给机器人，它会把它转换成gif然后发回给你。
@@ -97,10 +91,12 @@ python main.py
 
 ### 🖼️屏幕截图
 ---
-![截图](./images/img.png)
-![截图](./images/img_1.png)
-![截图](./images/img_2.png)
-![截图](./images/img_4.png)
+![Screenshot](./images/img.png)
+![Screenshot](./images/img_1.png)
+![Screenshot](./images/img_2.png)
+
+https://github.com/user-attachments/assets/a8cf5c0a-37bd-42f5-ba48-fa24fdbc2e18
+
 
 ### 🔗 相关仓库
 ---
