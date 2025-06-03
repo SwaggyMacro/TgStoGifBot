@@ -1,4 +1,5 @@
 loguru==0.7.2
 lottie==0.7.0
 Pyrogram==2.0.106
-tgcrypto
+python-telegram-bot~=22.1
+pillow~=11.2.1

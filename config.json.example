@@ -1,12 +1,14 @@
 {
   "bot_name": "Bot name",
-  "api_id": "from Telegram API",
-  "api_hash": "from Telegram API",
   "bot_token": "from @BotFather",
+  "convert_workers": 5,
+  "download_workers": 5,
   "proxy": {
-    "status": false,
-    "scheme": "http",
-    "hostname": "127.0.0.1",
-    "port": 10801
+    "status": true,
+    "type": "http",
+    "host": "127.0.0.1",
+    "port": 10803,
+    "username": "",
+    "password": ""
   }
 }
