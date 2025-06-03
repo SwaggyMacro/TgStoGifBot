@@ -20,15 +20,15 @@ def load_config(config_path: str = "config.json") -> dict:
     return config
 
 
-def setup_proxy_environment(proxy_config: dict) -> bool:
+def get_proxy_url(proxy_config: dict) -> str:
     """
-    Configure HTTP/SOCKS proxy environment variables based on provided settings.
+    Get the proxy URL from the configuration.
 
     :param proxy_config: Dictionary containing proxy settings.
-    :return: True if proxy was enabled; False otherwise.
+    :return: Formatted proxy URL or an empty string if not configured.
     """
     if not proxy_config.get("status", False):
-        return False
+        return ""
 
     proxy_type = proxy_config.get("type")
     host = proxy_config.get("host")
@@ -37,17 +37,11 @@ def setup_proxy_environment(proxy_config: dict) -> bool:
     password = proxy_config.get("password")
 
     if proxy_type not in ("http", "socks4", "socks5"):
-        return False
+        return ""
 
     if username and password:
         proxy_url = f"{proxy_type}://{username}:{password}@{host}:{port}"
     else:
         proxy_url = f"{proxy_type}://{host}:{port}"
 
-    os.environ["HTTP_PROXY"] = proxy_url
-    os.environ["HTTPS_PROXY"] = proxy_url
-    os.environ["http_proxy"] = proxy_url
-    os.environ["https_proxy"] = proxy_url
-
-    logger.info(f"Proxy configured: {proxy_url}")
-    return True
+    return proxy_url

@@ -4,7 +4,9 @@ Utility functions for file uploads and ZIP management.
 import asyncio
 import io
 import os
+import traceback
 
+from loguru import logger
 from telegram.error import RetryAfter, TimedOut
 
 
@@ -36,6 +38,7 @@ async def retry_upload_document(
                 await feedback_msg.reply_document(document=file_obj, caption=caption, parse_mode=parse_mode)
             return  # successful upload
         except (RetryAfter, TimedOut) as e:
+            logger.warning(f"Upload attempt {attempt} failed: {e}\n {traceback.format_exc()}")
             wait_secs = getattr(e, "retry_after", 5)
             await feedback_msg.reply_text(
                 f"⚠️ Upload error: {e.__class__.__name__}. Retrying in {wait_secs}s (attempt {attempt}/{max_retries})…"

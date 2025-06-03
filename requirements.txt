@@ -3,3 +3,5 @@ lottie==0.7.0
 Pyrogram==2.0.106
 python-telegram-bot~=22.1
 pillow~=11.2.1
+httpx~=0.28.1
+tornado~=6.5.1

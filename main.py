@@ -4,7 +4,7 @@ Main entry point: initialize bot, register handlers, and start polling.
 from loguru import logger
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 
-from config import load_config, setup_proxy_environment
+from config import load_config, get_proxy_url
 from handlers import (
     start,
     help_command,
@@ -33,14 +33,29 @@ def main() -> None:
     bot_token = config.get("bot_token")
 
     # Setup proxy if configured
-    proxy_enabled = setup_proxy_environment(config.get("proxy", {}))
+    proxy_enabled = config.get("proxy", {}).get("status", False)
     if proxy_enabled:
         logger.info("Bot is running with proxy support.")
     else:
         logger.info("Bot is running without proxy.")
 
     # Build application
-    application = Application.builder().token(bot_token).build()
+    if proxy_enabled:
+        application = (Application.builder()
+                       .token(bot_token)
+                       .proxy(get_proxy_url(config.get("proxy", {})))
+                       .connect_timeout(30)
+                       .read_timeout(30)
+                       .write_timeout(60)
+                       .get_updates_proxy(get_proxy_url(config.get("proxy", {})))
+                       .build())
+    else:
+        application = (Application.builder()
+                       .token(bot_token)
+                       .connect_timeout(30)
+                       .read_timeout(30)
+                       .write_timeout(60)
+                       .build())
 
     # Register command handlers
     application.add_handler(CommandHandler("start", start))

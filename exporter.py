@@ -5,12 +5,21 @@ import os
 import zipfile
 import asyncio
 import shutil
+
+from httpx import ConnectError
 from telegram.error import RetryAfter, TimedOut
 from loguru import logger
+
+from config import load_config
+from retry_utils import retry_on_exception
 from utils import split_and_upload_document
 from converter import tgs_convert
 from typing import Dict, Any
 
+
+_config = load_config()
+DOWNLOAD_WORKERS = _config.get("download_workers", 15)
+CONVERT_WORKERS = _config.get("convert_workers", 5)
 
 def get_script_path(format_type: str) -> str:
     """
@@ -36,6 +45,15 @@ def get_script_path(format_type: str) -> str:
     if format_type not in script_map:
         raise ValueError(f"Invalid format type: {format_type}")
     return script_map[format_type]
+
+
+@retry_on_exception((ConnectError, TimedOut, Exception), max_retries=None)
+async def get_file_retry(bot, file_id):
+    return await bot.get_file(file_id)
+
+@retry_on_exception((ConnectError, TimedOut, Exception), max_retries=None)
+async def download_to_drive_retry(file_obj, path):
+    return await file_obj.download_to_drive(path)
 
 
 async def process_single_export(
@@ -64,8 +82,8 @@ async def process_single_export(
 
         for attempt in range(3):
             try:
-                file = await bot.get_file(sticker_file_id)
-                await file.download_to_drive(tgs_path)
+                file = await get_file_retry(bot, sticker_file_id)
+                await download_to_drive_retry(file, tgs_path)
                 break
             except (RetryAfter, TimedOut) as e:
                 wait_time = getattr(e, "retry_after", 60)
@@ -137,24 +155,41 @@ async def process_set_export(
             f"📥 Downloading {total} animated .tgs…", parse_mode="Markdown"
         )
 
-        for idx, sticker in enumerate(animated):
-            if idx % 5 == 0:
-                await feedback_msg.reply_text(f"⏳ Downloading .tgs {idx+1}/{total}…")
-            out_path = f"{tmp_dir}/{sticker.file_unique_id}.tgs"
-            try:
-                file = await bot.get_file(sticker.file_id)
-                await file.download_to_drive(out_path)
-            except (RetryAfter, TimedOut):
-                continue  # skip or retry logic could be added here
+        sem_dl = asyncio.Semaphore(DOWNLOAD_WORKERS)
 
+        async def download_one(idx: int, sticker):
+            async with sem_dl:
+                for attempt in range(3):
+                    if idx % 5 == 0:
+                        await feedback_msg.reply_text(f"⏳ Downloading .tgs {idx + 1}/{total}…")
+                    out_path = f"{tmp_dir}/{sticker.file_unique_id}.tgs"
+                    try:
+                        file = await bot.get_file(sticker.file_id)
+                        await download_to_drive_retry(file, out_path)
+                        logger.info(f"Downloaded {sticker.file_unique_id}.tgs")
+                        break
+                    except (RetryAfter, TimedOut) as e:
+                        wait_time = getattr(e, "retry_after", 60)
+                        await feedback_msg.reply_text(
+                            f"⚠️ Rate limited, waiting {wait_time}s (retry {attempt + 1}/3)…", parse_mode="Markdown"
+                        )
+                        await asyncio.sleep(wait_time)
+                    except Exception as ex:
+                        logger.error(f"Failed downloading {sticker.file_unique_id}: {ex}")
+
+        await asyncio.gather(
+            *(download_one(i, st) for i, st in enumerate(animated))
+        )
+
+        # 打包 ZIP
         zip_path = f"{tmp_dir}/{sticker_set_name}_tgs.zip"
         with zipfile.ZipFile(zip_path, "w") as zf:
-            for sticker in animated:
-                tgs_path = f"{tmp_dir}/{sticker.file_unique_id}.tgs"
+            for st in animated:
+                tgs_path = f"{tmp_dir}/{st.file_unique_id}.tgs"
                 if os.path.exists(tgs_path):
                     zf.write(
                         tgs_path,
-                        f"{sticker_set_name}/tgs/{sticker.file_unique_id}.tgs"
+                        f"{sticker_set_name}/tgs/{st.file_unique_id}.tgs"
                     )
 
         await feedback_msg.reply_text("📤 Sending .tgs ZIP…", parse_mode="Markdown")
@@ -223,7 +258,7 @@ async def process_single_sticker(
         for attempt in range(3):
             try:
                 file = await bot.get_file(sticker_file_id)
-                await file.download_to_drive(tgs_path)
+                await download_to_drive_retry(file, tgs_path)
                 break
             except (RetryAfter, TimedOut) as e:
                 wait_time = getattr(e, "retry_after", 60)
@@ -326,43 +361,53 @@ async def process_sticker_set(
 
         # 1) Download all .tgs
         animated = [s for s in sticker_set.stickers if s.is_animated]
+        total = len(animated)
         if not animated:
             await feedback_msg.reply_text("ℹ️ No animated stickers found in this set.")
             return
-        total = len(animated)
+
         await feedback_msg.reply_text(
-            f"📥 Downloading `{sticker_set_name}` ({total} total)…\n_Downloading .tgs files one by one…_", parse_mode="Markdown"
+            f"📥 Downloading `{sticker_set_name}` ({total} total)…\n_Downloading .tgs files…_",
+            parse_mode="Markdown"
         )
-        for idx, sticker in enumerate(animated):
-            if idx % 5 == 0:
-                await feedback_msg.reply_text(f"⏳ Downloading sticker {idx+1} of {total}…")
-            out_path = f"{tmp_dir}/{sticker.file_unique_id}.tgs"
-            try:
-                file = await bot.get_file(sticker.file_id)
-                await file.download_to_drive(out_path)
-                logger.info(f"Downloaded {sticker.file_unique_id}.tgs")
-            except (RetryAfter, TimedOut) as e:
-                wait_time = getattr(e, "retry_after", 60)
-                await feedback_msg.reply_text(f"⚠️ Rate limited, waiting {wait_time}s (retry)…")
-                await asyncio.sleep(wait_time)
-                try:
-                    file = await bot.get_file(sticker.file_id)
-                    await file.download_to_drive(out_path)
-                except Exception as ex2:
-                    logger.error(f"Failed to download after retry {sticker.file_unique_id}: {ex2}")
-            except Exception as ex:
-                logger.error(f"Failed to download {sticker.file_unique_id}: {ex}")
+
+        sem_dl = asyncio.Semaphore(DOWNLOAD_WORKERS)
+
+        async def download_one(idx: int, sticker):
+            async with sem_dl:
+                if idx % 5 == 0:
+                    await feedback_msg.reply_text(f"⏳ Downloading sticker {idx + 1}/{total}…")
+                out_path = f"{tmp_dir}/{sticker.file_unique_id}.tgs"
+                for attempt in range(3):
+                    try:
+                        file = await get_file_retry(bot,sticker.file_id)
+                        await download_to_drive_retry(file, out_path)
+                        logger.info(f"Downloaded {sticker.file_unique_id}.tgs")
+                        break
+                    except (RetryAfter, TimedOut) as e:
+                        wait_time = getattr(e, "retry_after", 60)
+                        await feedback_msg.reply_text(
+                            f"⚠️ Rate limited, waiting {wait_time}s (retry {attempt + 1}/3)…", parse_mode="Markdown"
+                        )
+                        await asyncio.sleep(wait_time)
+                    except Exception as ex:
+                        logger.error(f"Failed downloading {sticker.file_unique_id}: {ex}")
+
+        await asyncio.gather(
+            *(download_one(i, st) for i, st in enumerate(animated))
+        )
 
         # 2) Convert each .tgs concurrently
         await feedback_msg.reply_text(
-            f"⚙️ Converting `{sticker_set_name}` to {chosen_format.upper()}…\n_This may take a while…_", parse_mode="Markdown"
+            f"⚙️ Converting `{sticker_set_name}` to {chosen_format.upper()}…", parse_mode="Markdown"
         )
         script_path = get_script_path(chosen_format)
-        sem = asyncio.Semaphore(5)
-        async def convert_one(sticker_obj, idx):
-            async with sem:
+        sem_conv = asyncio.Semaphore(CONVERT_WORKERS)
+
+        async def convert_one(idx: int, sticker_obj):
+            async with sem_conv:
                 if idx % 5 == 0:
-                    await feedback_msg.reply_text(f"⏳ Converting sticker {idx+1} of {total}…")
+                    await feedback_msg.reply_text(f"⏳ Converting sticker {idx + 1}/{total}…")
                 in_tgs = f"{tmp_dir}/{sticker_obj.file_unique_id}.tgs"
                 out_img = f"{tmp_dir}/{sticker_obj.file_unique_id}.{chosen_format}"
                 await asyncio.to_thread(
@@ -376,8 +421,10 @@ async def process_sticker_set(
                     script_path,
                 )
                 logger.info(f"Converted {sticker_obj.file_unique_id}.tgs → {out_img}")
-        tasks = [convert_one(st, i) for i, st in enumerate(animated)]
-        await asyncio.gather(*tasks)
+
+        await asyncio.gather(
+            *(convert_one(i, st) for i, st in enumerate(animated))
+        )
 
         # 3) Package all converted files plus original .tgs
         await feedback_msg.reply_text("📦 Zipping up results…", parse_mode="Markdown")
