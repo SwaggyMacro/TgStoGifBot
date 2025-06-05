@@ -10,14 +10,14 @@
     <a href="//github.com/SwaggyMacro/TgStoGifBot"><img src="https://img.shields.io/badge/Repo-TgStoGifBot-green"></a>
 </p>
 
-## Telegram Sticker Bot
----
+## 🤖 Telegram Sticker Bot
+
 Feature:
 - Convert Telegram sticker(`tgs`) to GIF, PNG, APNG, and WEBP.
 - Convert Telegram sticker sets to GIF, PNG, APNG, and WEBP.
 - Download `.tgs` files(including sticker sets).
 
-Demo Bot: [@sticker_to_gif_01_bot](https://t.me/sticker_to_gif_01_bot)  
+🤖 Demo Bot: [@sticker_to_gif_01_bot](https://t.me/sticker_to_gif_01_bot)  
 Sticker set conversion has been `disabled` on this bot to minimize resource usage and prevent abuse. Only `single sticker` can be converted to GIF, PNG, APNG, or WEBP. However, downloading the full .tgs files of sticker sets is `still allowed`.
 
 ### 📝 System Requirements
