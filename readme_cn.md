@@ -61,6 +61,8 @@ pip install -r requirements.txt
 {
   "bot_name": "Bot name",
   "bot_token": "你的机器人令牌",
+  "bot_username": "@BotUsername",
+  "allow_sticker_sets": true, // "True" 如果你想允许机器人转换整个贴纸包， "False" 如果你不想允许机器人转换整个贴纸包。
   "convert_workers": 5,
   "download_workers": 5,
   "proxy": {

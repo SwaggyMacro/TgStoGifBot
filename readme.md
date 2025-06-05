@@ -64,6 +64,8 @@ pip install -r requirements.txt
 {
   "bot_name": "Bot name",
   "bot_token": "from @BotFather",
+  "bot_username": "@BotUsername",
+  "allow_sticker_sets": true, // "True" if you want to allow the bot to convert the whole sticker set, "False" if you don't want to allow the bot to convert the whole sticker set.
   "convert_workers": 5,
   "download_workers": 5,
   "proxy": {

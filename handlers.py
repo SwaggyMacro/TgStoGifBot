@@ -9,23 +9,24 @@ from telegram import Update, Sticker, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from config import load_config
 from exporter import process_single_export, process_set_export, process_single_sticker, process_sticker_set
 
 # Constants and options for buttons
 FORMAT_OPTIONS = [
-    ("gif",  "🖼️ GIF"),
-    ("png",  "🌈 PNG"),
+    ("gif", "🖼️ GIF"),
+    ("png", "🌈 PNG"),
     ("webp", "🔄 WebP"),
     ("apng", "🎨 APNG"),
 ]
 QUALITY_OPTIONS = [
     ("100", "🔧 Quality = 100%"),
-    ("90",  "🔧 Quality = 90%"),
-    ("70",  "🔧 Quality = 70%"),
-    ("50",  "🔧 Quality = 50%"),
+    ("90", "🔧 Quality = 90%"),
+    ("70", "🔧 Quality = 70%"),
+    ("50", "🔧 Quality = 50%"),
 ]
 SIZE_OPTIONS = [
-    ("64x64",   "📐 64×64"),
+    ("64x64", "📐 64×64"),
     ("128x128", "📏 128×128"),
     ("256x256", "📏 256×256"),
     ("512x512", "📐 512×512"),
@@ -88,7 +89,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "🗃️ If the sticker sets are *too many*(may *causes error*, like [AnimatedEmojies](https://t.me/addstickers/AnimatedEmojies)), You should export sticker sets as `.tgs` files, and use this tool [lottie-converter](https://github.com/ed-asriyan/lottie-converter) to batch convert them to images(I prefer the docker way).\n\n"
         "*Only animated stickers are supported.*"
     )
-    await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, link_preview_options=LinkPreviewOptions(is_disabled=True))
+    await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN,
+                                    link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -343,6 +345,7 @@ async def single_fps_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
         feedback_msg=query.message,
     )
 
+
 async def set_sticker_set_flow(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Handle the sticker set link: prompt user for export or convert on a sticker set.
@@ -372,6 +375,7 @@ async def set_sticker_set_flow(update: Update, context: ContextTypes.DEFAULT_TYP
         logger.error(f"Error in set_sticker_set_flow: {e}")
         traceback.print_exc()
         await update.message.reply_text(f"❌ *Error:* `{e}`", parse_mode=ParseMode.MARKDOWN)
+
 
 async def set_action_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
@@ -411,12 +415,24 @@ async def set_action_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
 
     if data == "set_action_convert":
+        allow_sticker_sets = load_config()["allow_sticker_sets"]
+        if not allow_sticker_sets:
+            await query.edit_message_text(
+                "⚠️ *Sticker sets conversion is disabled.*\n"
+                "You can export sticker sets as `.tgs` files, and use this tool [lottie-converter]("
+                "https://github.com/ed-asriyan/lottie-converter) to batch convert them to images(I prefer the docker "
+                "way).",
+                parse_mode=ParseMode.MARKDOWN,
+                link_preview_options=LinkPreviewOptions(is_disabled=True)
+            )
+            return
         keyboard = build_button_grid(FORMAT_OPTIONS, prefix="set_format", columns=2)
         await query.edit_message_text(
             f"🔢 *Choose format* for `{sticker_set_name}`:",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=keyboard
         )
+
 
 async def set_format_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
@@ -453,6 +469,7 @@ async def set_format_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
         reply_markup=keyboard,
     )
 
+
 async def set_quality_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Handle quality selection for a sticker set and prompt for size.
@@ -488,6 +505,7 @@ async def set_quality_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard,
     )
+
 
 async def set_size_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
@@ -541,6 +559,7 @@ async def set_size_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard,
     )
+
 
 async def set_fps_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """

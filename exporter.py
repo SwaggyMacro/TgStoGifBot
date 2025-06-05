@@ -20,6 +20,7 @@ from typing import Dict, Any
 _config = load_config()
 DOWNLOAD_WORKERS = _config.get("download_workers", 15)
 CONVERT_WORKERS = _config.get("convert_workers", 5)
+BOT_USER_NAME = _config.get("bot_user_name", "@sticker\\_to\\_gif\\_01\\_bot")
 
 def get_script_path(format_type: str) -> str:
     """
@@ -306,7 +307,7 @@ async def process_single_sticker(
             feedback_msg,
             caption=(
                 f"✅ *Task Completed!*\n"
-                f"• *Credits:* @sticker_to_gif_01_bot\n"
+                f"• *Credits:* {BOT_USER_NAME}\n"
                 f"• [Add Stickers to Telegram](https://t.me/addstickers/{set_name})"
             ),
             zip_path=zip_path,
@@ -452,7 +453,7 @@ async def process_sticker_set(
             feedback_msg,
             caption=(
                 f"✅ *Task Completed!*\n"
-                f"• *Credits:* @sticker_to_gif_01_bot\n"
+                f"• *Credits:* {BOT_USER_NAME}"
                 f"• [Add Stickers to Telegram](https://t.me/addstickers/{sticker_set_name})"
             ),
             zip_path=zip_path,

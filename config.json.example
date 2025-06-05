@@ -1,8 +1,10 @@
 {
   "bot_name": "Bot name",
   "bot_token": "from @BotFather",
+  "bot_username": "@BotUsername",
   "convert_workers": 5,
   "download_workers": 5,
+  "allow_sticker_sets": true,
   "proxy": {
     "status": true,
     "type": "http",
