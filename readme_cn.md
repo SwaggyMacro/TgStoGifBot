@@ -9,6 +9,16 @@
     <a href="//github.com/SwaggyMacro/TgStoGifBot"><img src="https://img.shields.io/badge/Repo-TgStoGifBot-green"></a>
 </p>
 
+## Telegram Sticker Bot
+---
+功能:
+- 将电报的单个动画表情转换为GIF、PNG、APNG和WEBP格式的图片
+- 将电报的动画表情包转换为GIF、PNG、APNG和WEBP格式的图片
+- 导出`.tgs`文件（支持整个动画表情包的导出）
+
+Demo Bot: [@sticker_to_gif_01_bot](https://t.me/sticker_to_gif_01_bot)  
+为了减少`资源消耗`并防止`滥用`，`已禁用`该机器人上的动画表情包（Sticker set）转换功能。现在只允许将单个动画表情转换为 GIF、PNG、APNG 或 WEBP 格式。不过，仍然允许`下载整个`动画表情包的 `.tgs` 文件。
+
 ### 📝 系统需求
 ---
 安装运行时依赖。确保它们的路径在PATH变量中：
