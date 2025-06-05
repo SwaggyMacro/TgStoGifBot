@@ -83,13 +83,13 @@ pip install -r requirements.txt
 python main.py
 ```
 
-#### 4. Talk to the bot
+#### 5. Talk to the bot
 - Send a sticker to the bot, and it will convert it to a gif and send it back to you.
-- Send a StickerSet link to the bot, and it will convert all the stickers in the set to gif and zip it then send it back to you.
+- Send a sticker set link to the bot, and it will convert all the stickers in the set to gif and zip it then send it back to you.
 
 For example, you can use the following sticker set link to test the bot:
 ```
-/sets https://t.me/addstickers/PeopleMemes
+https://t.me/addstickers/GumLoveIs
 ```
 
 ### 🖼️ScreenShot

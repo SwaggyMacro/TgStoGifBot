@@ -65,10 +65,10 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("about", about_command))
-    application.add_handler(CommandHandler("sets", set_sticker_set_flow))
 
     # Register message handler for stickers
     application.add_handler(MessageHandler(filters.Sticker.ALL, sticker_to_gif))
+    application.add_handler(MessageHandler(filters.TEXT, set_sticker_set_flow))
 
     # Register callback handlers (patterns simplified)
     application.add_handler(

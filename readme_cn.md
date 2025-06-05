@@ -80,14 +80,14 @@ pip install -r requirements.txt
 python main.py
 ```
 
-示例，你可以使用以下表情包链接来测试机器人：
-```
-/sets https://t.me/addstickers/PeopleMemes
-```
-
 #### 5. 与机器人对话
 - 发送表情给机器人，它会把它转换成gif然后发回给你。
 - 发送一个表情包链接给机器人，它会把该表情包中的所有表情转换成gif，压缩后发送回给你。
+
+示例，你可以使用以下表情包链接来测试机器人：
+```
+https://t.me/addstickers/GumLoveIs
+```
 
 ### 🖼️屏幕截图
 ---

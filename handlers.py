@@ -5,7 +5,7 @@ import re
 import traceback
 
 from loguru import logger
-from telegram import Update, Sticker, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, Sticker, InlineKeyboardButton, InlineKeyboardMarkup, LinkPreviewOptions
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
@@ -64,7 +64,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "👋 **Hello!**\n\n"
         "I can convert your animated stickers into various image formats. 🎉\n\n"
         "• Send me a sticker and I will guide you through format, quality, size.\n"
-        "• Or use `/sets <link>` to convert an entire sticker set.\n"
+        "• Or send `sticker set link` to convert an entire sticker set.\n"
         "• Only `animated stickers` are supported.\n\n"
         "🔗 *Source on* [GitHub](https://github.com/SwaggyMacro/TgStoGifBot)"
     )
@@ -76,19 +76,19 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     Handle the /help command: send usage instructions.
     """
     help_text = (
-        "❓ **How to use me:**\n\n"
+        "❓ *How to use*\n\n"
         "1. 📥 Send me an *animated sticker*, and I’ll ask you to pick:\n"
-        "   • Step 1: *Format* (GIF, PNG, WebP, APNG)\n"
-        "   • Step 2: *Quality* (100%, 90%, 70%, 50%)\n"
-        "   • Step 3: *Size* (64×64, 128×128, 256×256, 512×512)\n\n"
-        "2. 📦 Use `/sets` to convert a whole sticker set:\n"
-        "   ```\n"
-        "   /sets https://t.me/addstickers/GumLoveIs\n"
-        "   ```\n"
-        "   • After sending `/sets <link>`, I’ll guide you through the same steps.\n\n"
+        "   • Step 1: *Action* (Export as .tgs, Convert to another format)\n"
+        "   • Step 2: *Format* (GIF, PNG, WebP, APNG)\n"
+        "   • Step 3: *Quality* (100%, 90%, 70%, 50%)\n"
+        "   • Step 4: *Size* (64×64, 128×128, 256×256, 512×512)\n"
+        "   • Step 5: *FPS* (12, 24, 30, 60, 90, 100)\n\n"
+        "2. 📦 Please send a link of sticker set, e.g.:\n`https://t.me/addstickers/GumLoveIs`\n"
+        "   • After sending `<sticker set link>`, I’ll guide you through the same steps.\n\n"
+        "🗃️ If the sticker sets are *too many*(may *causes error*, like [AnimatedEmojies](https://t.me/addstickers/AnimatedEmojies)), You should export sticker sets as `.tgs` files, and use this tool [lottie-converter](https://github.com/ed-asriyan/lottie-converter) to batch convert them to images(I prefer the docker way).\n\n"
         "*Only animated stickers are supported.*"
     )
-    await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN)
+    await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -345,18 +345,13 @@ async def single_fps_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def set_sticker_set_flow(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
-    Handle the /sets command: prompt user for export or convert on a sticker set.
+    Handle the sticker set link: prompt user for export or convert on a sticker set.
     """
     try:
         text = update.message.text or ""
         match = re.search(r"t\.me/addstickers/([a-zA-Z0-9_]+)", text)
         if not match:
-            keyboard = build_button_grid(FORMAT_OPTIONS, prefix="set_format", columns=2)
-            await update.message.reply_text(
-                "👉 Please send a link to a sticker set, e.g.:\n`/sets https://t.me/addstickers/GumLoveIs`\nFirst, choose *format*:",
-                parse_mode=ParseMode.MARKDOWN,
-                reply_markup=keyboard,
-            )
+            await help_command(update, context)
             return
 
         sticker_set_name = match.group(1)
@@ -388,7 +383,7 @@ async def set_action_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if data == "set_action_cancel":
         await query.edit_message_text(
-            "❌ *Operation canceled.*\nSend `/sets <link>` again any time.", parse_mode=ParseMode.MARKDOWN
+            "❌ *Operation canceled.*\nSend `<sticker set link>` again any time.", parse_mode=ParseMode.MARKDOWN
         )
         context.user_data.clear()
         return
@@ -396,7 +391,7 @@ async def set_action_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     sticker_set_name = context.user_data.get("sticker_set_name")
     if not sticker_set_name:
         await query.edit_message_text(
-            "⚠️ Something went wrong. Please send `/sets <link>` again.", parse_mode=ParseMode.MARKDOWN
+            "⚠️ Something went wrong. Please send `<sticker set link>` again", parse_mode=ParseMode.MARKDOWN
         )
         return
 
@@ -433,7 +428,7 @@ async def set_format_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if data.endswith("_cancel"):
         await query.edit_message_text(
-            "❌ *Operation canceled.*\nSend `/sets <link>` again any time.", parse_mode=ParseMode.MARKDOWN
+            "❌ *Operation canceled.*\nSend `<sticker set link>` again any time.", parse_mode=ParseMode.MARKDOWN
         )
         context.user_data.clear()
         return
@@ -446,7 +441,7 @@ async def set_format_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     sticker_set_name = context.user_data.get("sticker_set_name")
     if not sticker_set_name:
         await query.edit_message_text(
-            "⚠️ Something went wrong. Please send `/sets <link>` again.", parse_mode=ParseMode.MARKDOWN
+            "⚠️ Something went wrong. Please send `<sticker set link>` again", parse_mode=ParseMode.MARKDOWN
         )
         return
 
@@ -468,7 +463,7 @@ async def set_quality_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if data.endswith("_cancel"):
         await query.edit_message_text(
-            "❌ *Operation canceled.*\nSend `/sets <link>` again any time.", parse_mode=ParseMode.MARKDOWN
+            "❌ *Operation canceled.*\nSend `<sticker set link>` again any time.", parse_mode=ParseMode.MARKDOWN
         )
         context.user_data.clear()
         return
@@ -482,7 +477,7 @@ async def set_quality_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     chosen_format = context.user_data.get("sticker_set_format", "gif")
     if not sticker_set_name:
         await query.edit_message_text(
-            "⚠️ Something went wrong. Please send `/sets <link>` again.", parse_mode=ParseMode.MARKDOWN
+            "⚠️ Something went wrong. Please send `<sticker set link>` again", parse_mode=ParseMode.MARKDOWN
         )
         return
 
@@ -504,7 +499,7 @@ async def set_size_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     if data.endswith("_cancel"):
         await query.edit_message_text(
-            "❌ *Operation canceled.*\nSend `/sets <link>` again any time.", parse_mode=ParseMode.MARKDOWN
+            "❌ *Operation canceled.*\nSend `<sticker set link>` again any time.", parse_mode=ParseMode.MARKDOWN
         )
         context.user_data.clear()
         return
@@ -520,7 +515,7 @@ async def set_size_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     quality = context.user_data.get("sticker_set_quality", 100)
     if not sticker_set_name:
         await query.edit_message_text(
-            "⚠️ Something went wrong. Please send `/sets <link>` again.", parse_mode=ParseMode.MARKDOWN
+            "⚠️ Something went wrong. Please send `<sticker set link>` again", parse_mode=ParseMode.MARKDOWN
         )
         return
 
@@ -557,7 +552,7 @@ async def set_fps_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     if data.endswith("_cancel"):
         await query.edit_message_text(
-            "❌ *Operation canceled.*\nSend `/sets <link>` again any time.", parse_mode=ParseMode.MARKDOWN
+            "❌ *Operation canceled.*\nSend `<sticker set link>` again any time.", parse_mode=ParseMode.MARKDOWN
         )
         context.user_data.clear()
         return
@@ -575,7 +570,7 @@ async def set_fps_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     if not sticker_set_name or width is None or height is None:
         await query.edit_message_text(
-            "⚠️ Something went wrong. Please send `/sets <link>` again.", parse_mode=ParseMode.MARKDOWN
+            "⚠️ Something went wrong. Please send `<sticker set link>` again", parse_mode=ParseMode.MARKDOWN
         )
         return
 
