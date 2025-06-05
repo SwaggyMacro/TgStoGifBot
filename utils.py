@@ -81,6 +81,11 @@ async def split_and_upload_document(
         f"📦 Splitting large ZIP ({total_size // (1024*1024)} MB) into {num_parts} parts…"
     )
 
+    base_name = os.path.basename(zip_path)
+    windows_combine = ''
+    linux_combine = ''
+    macos_combine = ''
+
     with open(zip_path, "rb") as f:
         part_index = 1
         while True:
@@ -89,8 +94,31 @@ async def split_and_upload_document(
                 break
 
             bio = io.BytesIO(chunk_data)
-            base_name = os.path.basename(zip_path)
             bio.name = f"{base_name}.part{part_index:02d}"
             part_caption = f"{caption}\n(Part {part_index} of {num_parts})"
+            if part_index == 1:
+                windows_combine = f"```bash\ncopy /b {bio.name} + "
+                linux_combine = f"```bash\ncat {bio.name} "
+                macos_combine = f"```bash\ncat {bio.name} "
+            else:
+                windows_combine += f"{bio.name} + "
+                linux_combine += f"{bio.name} "
+                macos_combine += f"{bio.name} "
             await retry_upload_document(feedback_msg, bio, part_caption, parse_mode="Markdown")
             part_index += 1
+
+    # Finalize combine commands
+    windows_combine = windows_combine[:-3] + f" {base_name}.zip```"
+    linux_combine += f"> {base_name}.zip```"
+    macos_combine += f"> {base_name}.zip```"
+
+    await feedback_msg.reply_text("✅ All parts uploaded successfully.\n"
+                                  "🙋‍♂️ To combine them, use command below:\n"
+                                  "🖥️ **Windows**\n"
+                                  f"{windows_combine}\n"
+                                  "🐧 **Linux**\n"
+                                  f"{linux_combine}\n"
+                                  "🍎 **macOS**\n"
+                                  f"{macos_combine}\n\n"
+                                  "**Make sure to run the command in the same directory where the parts are saved.**", parse_mode="Markdown")
+
