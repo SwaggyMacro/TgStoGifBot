@@ -97,6 +97,7 @@ For example, you can use the following sticker set link to test the bot:
 ![Screenshot](./images/img.png)
 ![Screenshot](./images/img_1.png)
 ![Screenshot](./images/img_2.png)
+![Screenshot](./images/img_3.png)
 
 https://github.com/user-attachments/assets/a8cf5c0a-37bd-42f5-ba48-fa24fdbc2e18
 
