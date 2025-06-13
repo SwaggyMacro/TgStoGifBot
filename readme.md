@@ -8,7 +8,10 @@
     <a href="//julym.com/"><img src="https://img.shields.io/badge/Site-julym.com-pink"></a>
     <img src="https://img.shields.io/badge/version-1.0.0-yellow">
     <a href="//github.com/SwaggyMacro/TgStoGifBot"><img src="https://img.shields.io/badge/Repo-TgStoGifBot-green"></a>
-</p>
+</p> 
+
+### I prefer you to use this tool now, repo: [https://github.com/SwaggyMacro/LottieViewConvert](https://github.com/SwaggyMacro/LottieViewConvert) 
+An elegant, ready-to-use GUI that supports converting TGS or Lottie files into GIF, WebP, APNG, WebM, MKV, MP4, and AVIF. It offers fine-grained parameter control—FPS, playback speed adjustment to solve slow playback issues in exported GIFs, freely adjustable resolution, and quality settings. Batch conversion is supported, and you can supply Telegram sticker-pack URLs or names for automatic downloading. Built-in internationalization allows multiple languages, and dependencies can be installed automatically.
 
 ## 🤖 Telegram Sticker Bot
 
